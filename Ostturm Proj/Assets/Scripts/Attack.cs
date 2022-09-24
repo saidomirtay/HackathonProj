@@ -6,30 +6,24 @@ using static UnityEditor.PlayerSettings;
 
 public class Attack : MonoBehaviour
 {
-    public static bool isUrTurn;
+    public static int turn;
     private float maxAttackDistance = 4.9f;
     public static int hp;
     public static int actions;
-    private int bleedingDegree;
+    public static int bleedingDegree;
 
     private void Start()
     {
-        actions = 2;
+        turn = 0;
         hp = 2;
-        bleedingDegree = 0;
-        isUrTurn = true;
-    }
-
-    private void Update()
-    {
-        DamageDeal();
+        actions = 2;
     }
 
     private bool DistanceCheck()
     {
-        foreach (GameObject enemy in PlayerMovement.enemies)
+        foreach (GameObject character in PlayerMovement.characters)
         {
-            if (Vector3.Distance(transform.position, enemy.transform.position) <= maxAttackDistance)
+            if (Vector3.Distance(transform.position, character.transform.position) <= maxAttackDistance)
             {
                 return true;
             }
@@ -86,7 +80,15 @@ public class Attack : MonoBehaviour
     {
         if (actions <= 0)
         {
-            isUrTurn = false;
+            if (turn < PlayerMovement.characters.Length)
+            {
+                turn++;
+            }
+            else
+            {
+                turn = 0;
+            }
+
             if (bleedingDegree > 0)
             {
                 bleedingDegree++;
@@ -94,6 +96,6 @@ public class Attack : MonoBehaviour
         }
 
         if (hp <= 0 || bleedingDegree > 3)
-            Application.Quit();
+            Debug.Log("Game Over");
     }
 }

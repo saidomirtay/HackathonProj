@@ -7,14 +7,15 @@ using static UnityEngine.GraphicsBuffer;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public static GameObject[] enemies;
+    public static GameObject[] characters;
     public static bool legsFine;
 
     private void Start()
     {
-        enemies = new GameObject[2];
-        enemies[0] = GameObject.Find("Enemy 1");
-        enemies[1] = GameObject.Find("Enemy 2");
+        characters = new GameObject[3];
+        characters[0] = GameObject.Find("Player");
+        characters[1] = GameObject.Find("Enemy 1");
+        characters[2] = GameObject.Find("Enemy 2");
         legsFine = true;
     }
 
@@ -25,75 +26,72 @@ public class PlayerMovement : MonoBehaviour
 
     private void GetInput()
     {
-        if (Attack.actions > 0 && Attack.isUrTurn)
+        if (legsFine)
         {
-            if (legsFine)
+            if (Input.GetKeyDown(KeyCode.D))
             {
-                if (Input.GetKeyDown(KeyCode.D))
+                transform.eulerAngles = new Vector3(0, 90, 0);
+                Vector3 pos = transform.position;
+                if (pos.x < 5.55f)
                 {
-                    transform.eulerAngles = new Vector3(0, 90, 0);
-                    Vector3 pos = transform.position;
-                    if (pos.x < 5.55f)
+                    transform.position = new Vector3(pos.x + 3.7f, pos.y, pos.z);
+                    if (!EnemyPositionCheck(pos))
                     {
-                        transform.position = new Vector3(pos.x + 3.7f, pos.y, pos.z);
-                        if (!EnemyPositionCheck(pos))
-                        {
-                            Attack.actions--;
-                        }
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.A))
-                {
-                    transform.eulerAngles = new Vector3(0, -90, 0);
-                    Vector3 pos = transform.position;
-                    if (pos.x > -5.55f)
-                    {
-                        transform.position = new Vector3(pos.x - 3.7f, pos.y, pos.z);
-                        if (!EnemyPositionCheck(pos))
-                        {
-                            Attack.actions--;
-                        }
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.W))
-                {
-                    transform.eulerAngles = new Vector3(0, 0, 0);
-                    Vector3 pos = transform.position;
-                    if (pos.z < 3.2f)
-                    {
-                        transform.position = new Vector3(pos.x, pos.y, pos.z + 3.2f);
-                        if (!EnemyPositionCheck(pos))
-                        {
-                            Attack.actions--;
-                        }
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.S))
-                {
-                    transform.eulerAngles = new Vector3(0, 180, 0);
-                    Vector3 pos = transform.position;
-                    if (pos.z > -3.2f)
-                    {
-                        transform.position = new Vector3(pos.x, pos.y, pos.z - 3.2f);
-                        if (!EnemyPositionCheck(pos))
-                        {
-                            Attack.actions--;
-                        }
+                        Attack.actions--;
                     }
                 }
             }
-            else
+            else if (Input.GetKeyDown(KeyCode.A))
             {
-                legsFine = true;
+                transform.eulerAngles = new Vector3(0, -90, 0);
+                Vector3 pos = transform.position;
+                if (pos.x > -5.55f)
+                {
+                    transform.position = new Vector3(pos.x - 3.7f, pos.y, pos.z);
+                    if (!EnemyPositionCheck(pos))
+                    {
+                        Attack.actions--;
+                    }
+                }
             }
+            else if (Input.GetKeyDown(KeyCode.W))
+            {
+                transform.eulerAngles = new Vector3(0, 0, 0);
+                Vector3 pos = transform.position;
+                if (pos.z < 3.2f)
+                {
+                    transform.position = new Vector3(pos.x, pos.y, pos.z + 3.2f);
+                    if (!EnemyPositionCheck(pos))
+                    {
+                        Attack.actions--;
+                    }
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                transform.eulerAngles = new Vector3(0, 180, 0);
+                Vector3 pos = transform.position;
+                if (pos.z > -3.2f)
+                {
+                    transform.position = new Vector3(pos.x, pos.y, pos.z - 3.2f);
+                    if (!EnemyPositionCheck(pos))
+                    {
+                        Attack.actions--;
+                    }
+                }
+            }
+        }
+        else
+        {
+            legsFine = true;
         }
     }
 
     private bool EnemyPositionCheck(Vector3 pos)
     {
-        foreach (GameObject enemy in enemies)
+        foreach (GameObject character in characters)
         {
-            if (transform.position == enemy.transform.position)
+            if (transform.position == character.transform.position && gameObject != character)
             {
                 transform.position = pos;
                 return true;
