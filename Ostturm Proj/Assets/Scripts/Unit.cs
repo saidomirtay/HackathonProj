@@ -7,8 +7,8 @@ public class Unit : MonoBehaviour
     public string naming;
     public int maxHP;
     public int currentHP;
-    public int actions;
-    public int damage;
+    public int maxActions;
+    public int currentActions;
     public int bleeding;
     public bool legsFine;
 

@@ -7,93 +7,97 @@ using static UnityEngine.GraphicsBuffer;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public static GameObject[] characters;
-    public static bool legsFine;
+    private BattleSystem battleSystem;
 
     private void Start()
     {
-        characters = new GameObject[3];
-        characters[0] = GameObject.Find("Player");
-        characters[1] = GameObject.Find("Enemy 1");
-        characters[2] = GameObject.Find("Enemy 2");
-        legsFine = true;
+        battleSystem = GetComponent<BattleSystem>();
     }
-
+    
     private void Update()
     {
-        GetInput();
+        switch (BattleSystem.state)
+        {
+            case BattleState.FIRSTTURN:
+                GetInput(BattleSystem.characters[0], 0);
+                break;
+            case BattleState.SECONDTURN:
+                GetInput(BattleSystem.characters[1], 1);
+                break;
+            case BattleState.THIRDTURN:
+                GetInput(BattleSystem.characters[2], 2);
+                break;
+        }
     }
 
-    private void GetInput()
+    private void GetInput(GameObject MovingObject, int index)
     {
-        if (legsFine)
+        if (battleSystem.charactersUnits[index].currentActions > 0)
         {
             if (Input.GetKeyDown(KeyCode.D))
             {
-                transform.eulerAngles = new Vector3(0, 90, 0);
-                Vector3 pos = transform.position;
+                MovingObject.transform.eulerAngles = new Vector3(0, 90, 0);
+                Vector3 pos = MovingObject.transform.position;
                 if (pos.x < 5.55f)
                 {
-                    transform.position = new Vector3(pos.x + 3.7f, pos.y, pos.z);
-                    if (!EnemyPositionCheck(pos))
+                    MovingObject.transform.position = new Vector3(pos.x + 3.7f, pos.y, pos.z);
+                    if (!EnemyPositionCheck(pos, MovingObject))
                     {
-                        Attack.actions--;
+                        battleSystem.SubtractActions(index);
                     }
                 }
             }
             else if (Input.GetKeyDown(KeyCode.A))
             {
-                transform.eulerAngles = new Vector3(0, -90, 0);
-                Vector3 pos = transform.position;
+                MovingObject.transform.eulerAngles = new Vector3(0, -90, 0);
+                Vector3 pos = MovingObject.transform.position;
                 if (pos.x > -5.55f)
                 {
-                    transform.position = new Vector3(pos.x - 3.7f, pos.y, pos.z);
-                    if (!EnemyPositionCheck(pos))
+                    MovingObject.transform.position = new Vector3(pos.x - 3.7f, pos.y, pos.z);
+                    if (!EnemyPositionCheck(pos, MovingObject))
                     {
-                        Attack.actions--;
+                        battleSystem.SubtractActions(index);
                     }
                 }
             }
             else if (Input.GetKeyDown(KeyCode.W))
             {
-                transform.eulerAngles = new Vector3(0, 0, 0);
-                Vector3 pos = transform.position;
+                MovingObject.transform.eulerAngles = new Vector3(0, 0, 0);
+                Vector3 pos = MovingObject.transform.position;
                 if (pos.z < 3.2f)
                 {
-                    transform.position = new Vector3(pos.x, pos.y, pos.z + 3.2f);
-                    if (!EnemyPositionCheck(pos))
+                    MovingObject.transform.position = new Vector3(pos.x, pos.y, pos.z + 3.2f);
+                    if (!EnemyPositionCheck(pos, MovingObject))
                     {
-                        Attack.actions--;
+                        battleSystem.SubtractActions(index);
                     }
                 }
             }
             else if (Input.GetKeyDown(KeyCode.S))
             {
-                transform.eulerAngles = new Vector3(0, 180, 0);
-                Vector3 pos = transform.position;
+                MovingObject.transform.eulerAngles = new Vector3(0, 180, 0);
+                Vector3 pos = MovingObject.transform.position;
                 if (pos.z > -3.2f)
                 {
-                    transform.position = new Vector3(pos.x, pos.y, pos.z - 3.2f);
-                    if (!EnemyPositionCheck(pos))
+                    MovingObject.transform.position = new Vector3(pos.x, pos.y, pos.z - 3.2f);
+                    if (!EnemyPositionCheck(pos, MovingObject))
                     {
-                        Attack.actions--;
+                        battleSystem.SubtractActions(index);
                     }
                 }
             }
         }
         else
-        {
-            legsFine = true;
-        }
+            battleSystem.NextTurn(index);
     }
 
-    private bool EnemyPositionCheck(Vector3 pos)
+    private bool EnemyPositionCheck(Vector3 pos, GameObject MovingObject)
     {
-        foreach (GameObject character in characters)
+        foreach (GameObject character in BattleSystem.characters)
         {
-            if (transform.position == character.transform.position && gameObject != character)
+            if (MovingObject.transform.position == character.transform.position && MovingObject != character)
             {
-                transform.position = pos;
+                MovingObject.transform.position = pos;
                 return true;
             }
         }

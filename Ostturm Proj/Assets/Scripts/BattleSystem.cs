@@ -5,26 +5,34 @@ using UnityEngine;
 using TMPro;
 using UnityEditor.Search;
 using UnityEngine.SceneManagement;
+using System;
+using System.ComponentModel;
 
 public enum BattleState { FIRSTTURN, SECONDTURN, THIRDTURN, GAMEOVER }
 
 public class BattleSystem : MonoBehaviour
 {
-    public BattleState state;
+    public static BattleState state;
 
-    public GameObject[] characters;
+    public static GameObject[] characters;
 
 
     [HideInInspector]
     public Unit[] charactersUnits;
 
     public BattleHUD[] charactersHUD;
+    [SerializeField] TMP_Text actionsLeftText;
 
     private float maxAttackDistance = 3.8f;
     [SerializeField] private  int deadEnemies;
 
     private void Start()
     {
+        characters = new GameObject[3];
+        characters[0] = GameObject.Find("Player");
+        characters[1] = GameObject.Find("Enemy 1");
+        characters[2] = GameObject.Find("Enemy 2");
+
         deadEnemies = 0;
         state = BattleState.FIRSTTURN;
         charactersUnits = new Unit[characters.Length];
@@ -64,6 +72,8 @@ public class BattleSystem : MonoBehaviour
             {
                 charactersHUD[i].turn.text = "turn";
                 charactersHUD[i].Circle.SetActive(true);
+                charactersUnits[i].currentActions = charactersUnits[i].maxActions;
+                SetActionsLeftText(charactersUnits[i].currentActions);
             }
         }
     }
@@ -89,45 +99,73 @@ public class BattleSystem : MonoBehaviour
 
     private void AttackCheck(int index)
     {
-        Vector3 attackerPos = characters[index].transform.position;
-        for (int i = 0; i < characters.Length; i++)
+        if (charactersUnits[index].currentActions > 0)
         {
-            if (Vector3.Distance(characters[i].transform.position, attackerPos) <= maxAttackDistance && characters[i] != characters[index])
+            Vector3 attackerPos = characters[index].transform.position;
+            for (int i = 0; i < characters.Length; i++)
             {
-                bool isEnemyDead = charactersUnits[i].TakeDamage(1);
-                charactersHUD[i].SetHP(charactersUnits[i].currentHP);
-
-                if (isEnemyDead)
+                if (Vector3.Distance(characters[i].transform.position, attackerPos) <= maxAttackDistance && characters[i] != characters[index])
                 {
-                    deadEnemies++;
-                    if (deadEnemies > 1)
+                    bool isEnemyDead = charactersUnits[i].TakeDamage(1);
+
+                    charactersHUD[i].SetHP(charactersUnits[i].currentHP);
+
+                    if (isEnemyDead)
                     {
-                        state = BattleState.GAMEOVER;
-                        EndBattle();
+                        deadEnemies++;
+                        if (deadEnemies > 1)
+                        {
+                            state = BattleState.GAMEOVER;
+                            EndBattle();
+                        }
+                        charactersUnits[i].maxActions = 0;
+                        characters[i].transform.position = new Vector3(999f, 999f, 999);
                     }
-                }
 
-                switch (index)
-                {
-                    case 0:
-                        state = BattleState.SECONDTURN;
-                        WhosTurn(charactersHUD[1]);
-                        break;
-                    case 1:
-                        state = BattleState.THIRDTURN;
-                        WhosTurn(charactersHUD[2]);
-                        break;
-                    case 2:
-                        state = BattleState.FIRSTTURN;
-                        WhosTurn(charactersHUD[0]);
-                        break;
+                    SubtractActions(index);
                 }
             }
         }
+        else
+            NextTurn(index);
     }
 
     private void EndBattle()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void SubtractActions(int index)
+    {
+        charactersUnits[index].currentActions--;
+        SetActionsLeftText(charactersUnits[index].currentActions);
+        if (charactersUnits[index].currentActions <= 0)
+        {
+            NextTurn(index);
+        }
+    }
+
+    private void SetActionsLeftText(int actions)
+    {
+        actionsLeftText.text = "Actions left: " + actions;
+    }
+
+    public void NextTurn(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                state = BattleState.SECONDTURN;
+                WhosTurn(charactersHUD[1]);
+                break;
+            case 1:
+                state = BattleState.THIRDTURN;
+                WhosTurn(charactersHUD[2]);
+                break;
+            case 2:
+                state = BattleState.FIRSTTURN;
+                WhosTurn(charactersHUD[0]);
+                break;
+        }
     }
 }

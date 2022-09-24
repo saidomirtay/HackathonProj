@@ -21,7 +21,7 @@ public class Attack : MonoBehaviour
 
     private bool DistanceCheck()
     {
-        foreach (GameObject character in PlayerMovement.characters)
+        foreach (GameObject character in BattleSystem.characters)
         {
             if (Vector3.Distance(transform.position, character.transform.position) <= maxAttackDistance)
             {
@@ -63,7 +63,6 @@ public class Attack : MonoBehaviour
             {
                 if (Random.Range(0, 3) == 0)
                 {
-                    PlayerMovement.legsFine = false;
                 }
                 else
                 {
@@ -80,7 +79,7 @@ public class Attack : MonoBehaviour
     {
         if (actions <= 0)
         {
-            if (turn < PlayerMovement.characters.Length)
+            if (turn < BattleSystem.characters.Length)
             {
                 turn++;
             }
