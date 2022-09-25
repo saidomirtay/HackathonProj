@@ -1,10 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.GraphicsBuffer;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -120,27 +114,10 @@ public class PlayerMovement : MonoBehaviour
         {
             if (Vector3.Distance(BattleSystem.characters[index].transform.position, bottles[i].transform.position) < 1)
             {
+                Debug.Log(battleSystem.charactersUnits[i].naming + " picked up a bottle!");
                 bottles[i].transform.position = new Vector3(777, 777, 777);
                 battleSystem.RangedWeapon(index);
             }
         }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("bottle claimed");
-        switch (BattleSystem.state)
-        {
-            case BattleState.FIRSTTURN:
-                battleSystem.RangedWeapon(0);
-                break;
-            case BattleState.SECONDTURN:
-                battleSystem.RangedWeapon(1);
-                break;
-            case BattleState.THIRDTURN:
-                battleSystem.RangedWeapon(2);
-                break;
-        }
-        Destroy(other.gameObject);
     }
 }

@@ -10,7 +10,8 @@ public class BattleHUD : MonoBehaviour
     public TMP_Text turn;
     [SerializeField] TMP_Text status;
     [SerializeField] Slider sliderHP;
-    public GameObject Circle;
+    public GameObject turnCircle;
+    public GameObject damageCircle;
 
     public void SetHUD(Unit unit)
     {
