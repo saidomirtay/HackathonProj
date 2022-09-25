@@ -63,6 +63,7 @@ public class Attack : MonoBehaviour
             {
                 if (Random.Range(0, 3) == 0)
                 {
+
                 }
                 else
                 {

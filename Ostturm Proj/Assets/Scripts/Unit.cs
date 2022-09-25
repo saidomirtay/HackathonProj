@@ -10,7 +10,7 @@ public class Unit : MonoBehaviour
     public int maxActions;
     public int currentActions;
     public int bleeding;
-    public bool legsFine;
+    public int legsFine;
 
     public bool TakeDamage(int dmg)
     {

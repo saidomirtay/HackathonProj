@@ -23,4 +23,9 @@ public class BattleHUD : MonoBehaviour
     {
         sliderHP.value = hp;
     }
+
+    public void SetStatus(string stat)
+    {
+        status.text = stat;
+    }
 }

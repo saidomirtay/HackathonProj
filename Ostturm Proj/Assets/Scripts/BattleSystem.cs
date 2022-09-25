@@ -7,6 +7,8 @@ using UnityEditor.Search;
 using UnityEngine.SceneManagement;
 using System;
 using System.ComponentModel;
+using Random = UnityEngine.Random;
+using System.Runtime.CompilerServices;
 
 public enum BattleState { FIRSTTURN, SECONDTURN, THIRDTURN, GAMEOVER }
 
@@ -24,7 +26,7 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] TMP_Text actionsLeftText;
 
     private float maxAttackDistance = 3.8f;
-    [SerializeField] private  int deadEnemies;
+    [SerializeField] private int deadEnemies;
 
     private void Start()
     {
@@ -63,17 +65,23 @@ public class BattleSystem : MonoBehaviour
     {
         for (int i = 0; i < charactersHUD.Length; i++)
         {
-            if(charactersHUD[i] != HUD)
+            if (charactersHUD[i] != HUD)
             {
                 charactersHUD[i].turn.text = "";
                 charactersHUD[i].Circle.SetActive(false);
             }
             else
             {
+                charactersHUD[i].SetHP(charactersUnits[i].currentHP);
                 charactersHUD[i].turn.text = "turn";
                 charactersHUD[i].Circle.SetActive(true);
                 charactersUnits[i].currentActions = charactersUnits[i].maxActions;
                 SetActionsLeftText(charactersUnits[i].currentActions);
+                if (charactersUnits[i].bleeding == 3)
+                {
+                    charactersUnits[i].currentHP = 0;
+                    OnEnemyDeath(i);
+                }
             }
         }
     }
@@ -106,22 +114,8 @@ public class BattleSystem : MonoBehaviour
             {
                 if (Vector3.Distance(characters[i].transform.position, attackerPos) <= maxAttackDistance && characters[i] != characters[index])
                 {
-                    bool isEnemyDead = charactersUnits[i].TakeDamage(1);
-
-                    charactersHUD[i].SetHP(charactersUnits[i].currentHP);
-
-                    if (isEnemyDead)
-                    {
-                        deadEnemies++;
-                        if (deadEnemies > 1)
-                        {
-                            state = BattleState.GAMEOVER;
-                            EndBattle();
-                        }
-                        charactersUnits[i].maxActions = 0;
-                        characters[i].transform.position = new Vector3(999f, 999f, 999);
-                    }
-
+                    BodyPart(i);
+                    
                     SubtractActions(index);
                 }
             }
@@ -130,9 +124,81 @@ public class BattleSystem : MonoBehaviour
             NextTurn(index);
     }
 
-    private void EndBattle()
+    private void BodyPart(int i)
     {
-        SceneManager.LoadScene(0);
+        int bodyPart = Random.Range(0, 6);
+        if (bodyPart == 0)
+        {
+            Debug.Log("head");
+            if (Random.Range(0, 3) == 0)
+            {
+                Debug.Log("instant kill");
+                charactersUnits[i].currentHP = 0;
+                charactersHUD[i].SetHP(charactersUnits[i].currentHP);
+                OnEnemyDeath(i);
+            }
+            else
+            {
+                bool isEnemyDead = charactersUnits[i].TakeDamage(1);
+                charactersHUD[i].SetHP(charactersUnits[i].currentHP);
+                if (isEnemyDead)
+                {
+                    OnEnemyDeath(i);
+                }
+            }
+        }
+        else if (bodyPart > 3)
+        {
+            Debug.Log("legs");
+            if (Random.Range(0, 3) == 0)
+            {
+                Debug.Log("immobilization");
+                charactersUnits[i].legsFine++;
+                charactersHUD[i].SetStatus("immobilized");
+            }
+            else
+            {
+                bool isEnemyDead = charactersUnits[i].TakeDamage(1);
+                charactersHUD[i].SetHP(charactersUnits[i].currentHP);
+                if (isEnemyDead)
+                {
+                    OnEnemyDeath(i);
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("body");
+            if (Random.Range(0, 5) == 0)
+            {
+                Debug.Log("bleeding");
+                charactersUnits[i].bleeding++;
+                charactersHUD[i].SetStatus("bleeding");
+            }
+            else
+            {
+                bool isEnemyDead = charactersUnits[i].TakeDamage(1);
+                charactersHUD[i].SetHP(charactersUnits[i].currentHP);
+                if (isEnemyDead)
+                {
+                    OnEnemyDeath(i);
+                }
+            }
+        }
+    }
+
+    private void OnEnemyDeath(int i)
+    {
+        deadEnemies++;
+        if (deadEnemies > 1)
+        {
+            state = BattleState.GAMEOVER;
+            EndBattle();
+        }
+        charactersUnits[i].maxActions = 0;
+        charactersUnits[i].currentActions = 0;
+        charactersHUD[i].SetHP(0);
+        characters[i].transform.position = new Vector3(999, 999, 999);
     }
 
     public void SubtractActions(int index)
@@ -152,6 +218,11 @@ public class BattleSystem : MonoBehaviour
 
     public void NextTurn(int index)
     {
+        if (charactersUnits[index].bleeding > 0)
+        {
+            charactersUnits[index].bleeding++;
+        }
+
         switch (index)
         {
             case 0:
@@ -167,5 +238,11 @@ public class BattleSystem : MonoBehaviour
                 WhosTurn(charactersHUD[0]);
                 break;
         }
+    }
+
+    private void EndBattle()
+    {
+        Debug.Log("Game Over");
+        SceneManager.LoadScene(0);
     }
 }

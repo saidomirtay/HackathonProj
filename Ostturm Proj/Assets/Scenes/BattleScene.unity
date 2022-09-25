@@ -2300,8 +2300,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   naming: Player
-  maxHP: 2
-  currentHP: 2
+  maxHP: 4
+  currentHP: 4
   maxActions: 2
   currentActions: 0
   bleeding: 0
@@ -2829,8 +2829,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   naming: Tair
-  maxHP: 2
-  currentHP: 2
+  maxHP: 4
+  currentHP: 4
   maxActions: 2
   currentActions: 0
   bleeding: 0
@@ -4432,8 +4432,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   naming: Said
-  maxHP: 2
-  currentHP: 2
+  maxHP: 4
+  currentHP: 4
   maxActions: 2
   currentActions: 0
   bleeding: 0

@@ -32,7 +32,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void GetInput(GameObject MovingObject, int index)
     {
-        if (battleSystem.charactersUnits[index].currentActions > 0)
+        if (battleSystem.charactersUnits[index].currentActions > 0 && battleSystem.charactersUnits[index].legsFine != 1)
         {
             if (Input.GetKeyDown(KeyCode.D))
             {
@@ -88,7 +88,11 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         else
+        {
+            battleSystem.charactersUnits[index].legsFine = 0;
+            battleSystem.charactersHUD[index].SetStatus("");
             battleSystem.NextTurn(index);
+        }
     }
 
     private bool EnemyPositionCheck(Vector3 pos, GameObject MovingObject)
