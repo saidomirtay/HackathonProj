@@ -25,7 +25,6 @@ public class BattleSystem : MonoBehaviour
     public BattleHUD[] charactersHUD;
     [SerializeField] TMP_Text actionsLeftText;
 
-    private float maxAttackDistance = 3.8f;
     [SerializeField] private int deadEnemies;
 
     private void Start()
@@ -112,7 +111,7 @@ public class BattleSystem : MonoBehaviour
             Vector3 attackerPos = characters[index].transform.position;
             for (int i = 0; i < characters.Length; i++)
             {
-                if (Vector3.Distance(characters[i].transform.position, attackerPos) <= maxAttackDistance && characters[i] != characters[index])
+                if (Vector3.Distance(characters[i].transform.position, attackerPos) <= charactersUnits[index].maxAttackDistance && characters[i] != characters[index])
                 {
                     BodyPart(i);
                     
@@ -238,6 +237,12 @@ public class BattleSystem : MonoBehaviour
                 WhosTurn(charactersHUD[0]);
                 break;
         }
+    }
+
+    public void RangedWeapon(int index)
+    {
+        charactersUnits[index].maxAttackDistance *= 2;
+        charactersUnits[index].ChangeWeapon();
     }
 
     private void EndBattle()

@@ -11,6 +11,9 @@ public class Unit : MonoBehaviour
     public int currentActions;
     public int bleeding;
     public int legsFine;
+    public float maxAttackDistance;
+    public GameObject meleeWeapon;
+    public GameObject rangedWeapon;
 
     public bool TakeDamage(int dmg)
     {
@@ -22,5 +25,11 @@ public class Unit : MonoBehaviour
         }
         else
             return false;
+    }
+
+    public void ChangeWeapon()
+    {
+        meleeWeapon.SetActive(false);
+        rangedWeapon.SetActive(true);
     }
 }

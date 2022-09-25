@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,6 +9,7 @@ using static UnityEngine.GraphicsBuffer;
 public class PlayerMovement : MonoBehaviour
 {
     private BattleSystem battleSystem;
+    public GameObject[] bottles;
 
     private void Start()
     {
@@ -46,6 +48,7 @@ public class PlayerMovement : MonoBehaviour
                         battleSystem.SubtractActions(index);
                     }
                 }
+                BottleClaim(index);
             }
             else if (Input.GetKeyDown(KeyCode.A))
             {
@@ -59,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
                         battleSystem.SubtractActions(index);
                     }
                 }
+                BottleClaim(index);
             }
             else if (Input.GetKeyDown(KeyCode.W))
             {
@@ -72,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
                         battleSystem.SubtractActions(index);
                     }
                 }
+                BottleClaim(index);
             }
             else if (Input.GetKeyDown(KeyCode.S))
             {
@@ -85,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
                         battleSystem.SubtractActions(index);
                     }
                 }
+                BottleClaim(index);
             }
         }
         else
@@ -106,5 +112,35 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         return false;
+    }
+
+    private void BottleClaim(int index)
+    {
+        for (int i = 0; i < bottles.Length; i++)
+        {
+            if (Vector3.Distance(BattleSystem.characters[index].transform.position, bottles[i].transform.position) < 1)
+            {
+                bottles[i].transform.position = new Vector3(777, 777, 777);
+                battleSystem.RangedWeapon(index);
+            }
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("bottle claimed");
+        switch (BattleSystem.state)
+        {
+            case BattleState.FIRSTTURN:
+                battleSystem.RangedWeapon(0);
+                break;
+            case BattleState.SECONDTURN:
+                battleSystem.RangedWeapon(1);
+                break;
+            case BattleState.THIRDTURN:
+                battleSystem.RangedWeapon(2);
+                break;
+        }
+        Destroy(other.gameObject);
     }
 }
